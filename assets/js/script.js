@@ -163,17 +163,23 @@ $(".card .list-group").sortable({
   scroll: false,
   tolerance: "pointer",
   helper: "clone",
-  activate: function (event) {
+  activate: function (event) { // click and hold
     console.log("activate", this);
+    $(this).addClass("dropover");
+    $(".bottom-trash").addClass("bottom-trash-drag");
   },
-  deactivate: function (event) {
+  deactivate: function (event) { // drop held click
     console.log("deactivate", this);
+    $(this).removeClass("dropover");
+    $(".bottom-trash").removeClass("bottom-trash-drag");
   },
-  over: function (event) {
+  over: function (event) { // hover over target
     console.log("over", event.target);
+    $(event.target).addClass("dropover-active");
   },
-  out: function (event) {
+  out: function (event) { // leave target
     console.log("out", event.target);
+    $(event.target).removeClass("dropover-active");
   },
   update: function (event) {
     // array to store the task data in
@@ -217,12 +223,15 @@ $("#trash").droppable({
   tolerance: "touch",
   drop: function (event, ui) {
     ui.draggable.remove();
+    $(".bottom-trash").removeClass("bottom-trash-active");
   },
   over: function (event, ui) {
     console.log("over");
+    $(".bottom-trash").addClass("bottom-trash-active");
   },
   out: function (event, ui) {
     console.log("out");
+    $(".bottom-trash").removeClass("bottom-trash-active");
   }
 });
 
@@ -239,7 +248,7 @@ $("#task-form-modal").on("shown.bs.modal", function () {
 });
 
 // save button in modal was clicked
-$("#task-form-modal .btn-primary").click(function () {
+$("#task-form-modal .btn-save").click(function () {
   // get form values
   var taskText = $("#modalTaskDescription").val();
   var taskDate = $("#modalDueDate").val();
@@ -283,6 +292,8 @@ var auditTask = function (taskEl) {
     $(taskEl).addClass("list-group-item-warning");
   }
 
+  console.log(taskEl);
+
 };
 
 // remove all tasks
@@ -296,5 +307,11 @@ $("#remove-tasks").on("click", function () {
 
 // load tasks for the first time
 loadTasks();
+
+setInterval(function () {
+  $(".card .list-group-item").each(function (index, el) {
+    auditTask(el)
+  });
+}, (1000 * 60) * 30);
 
 
